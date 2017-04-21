@@ -32,7 +32,7 @@ http.createServer((req, res) => {
         return queue.push({ pathname, fn });
     }
     if (req.method === 'DELETE') {
-        if (root === pathname) {
+        if (pathname === root) {
             next();
         } else {
             const index = queue.findIndex(item => item.pathname === pathname);

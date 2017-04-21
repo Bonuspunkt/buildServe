@@ -1,5 +1,9 @@
 # buildServe
 
+- http server w/o directory listing.
+- directories that should be served, must be setup via http POST request
+- multiple serve request will be queued up (response will be delayed till ready)
+
 ## run
 ``` bash
 node index.js [port]
