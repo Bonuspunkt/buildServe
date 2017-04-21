@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+const fs = require('fs');
 const http = require('http');
+const path = require('path');
 const url = require('url');
 
 const send = require('send');
@@ -9,6 +11,7 @@ const [, , port = 8080] = process.argv;
 
 let root;
 let timeoutId;
+const defaultTimeout = 60;
 const queue = [];
 
 const next = () => {
@@ -20,27 +23,29 @@ const next = () => {
 
 http.createServer((req, res) => {
     const { pathname, query = {} } = url.parse(req.url, true);
+    const servePath = path.resolve(pathname);
 
     if (req.method === 'POST') {
         const fn = () => {
-            root = pathname;
+            root = servePath;
             res.writeHead(200, { 'content-type': 'text/plain' });
-            res.end(pathname);
-            const duration = Number(query.duration) || 60;
+            res.end(servePath);
+            const duration = Number(query.duration) || defaultTimeout;
             timeoutId = setTimeout(next, duration * 1e3);
         };
         if (!root) { return fn(); }
-        return queue.push({ pathname, fn });
+        console.log(`queued ${ servePath }`)
+        return queue.push({ servePath, fn });
     }
     if (req.method === 'DELETE') {
-        if (pathname === root) {
+        if (servePath === root) {
             next();
         } else {
-            const index = queue.findIndex(item => item.pathname === pathname);
+            const index = queue.findIndex(item => item.servePath === servePath);
             if (index !== -1) { queue.splice(index, 1); }
         }
         res.writeHead(200, { 'content-type': 'text/plain' });
-        res.end(pathname);
+        res.end(servePath);
         return;
     }
 
