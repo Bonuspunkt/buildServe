@@ -4,6 +4,7 @@ const url = require('url');
 
 const send = require('send');
 
+const host = '127.0.0.1';
 const [, , port = 8080] = process.argv;
 
 let root;
@@ -55,4 +56,6 @@ http.createServer((req, res) => {
     res.end('not set up');
     return;
 
-}).listen(port, '127.0.0.1');
+}).listen(port, host);
+
+console.log(`running at http://${ host }:${ port }`);
